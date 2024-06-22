@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
-import 'package:gemini_chat/pages/chat-pages.dart';
+import 'package:gemini_chat/pages/chat_pages.dart';
 
 
 void main() async {
