@@ -24,6 +24,33 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  Future<void> sendMessage() async {
+    if (controller.text.isNotEmpty) {
+      final userMessage = controller.text;
+      setState(() {
+        chats.add(Content(role: 'user', parts: [Parts(text: userMessage)]));
+        controller.clear();
+        loading = true;
+      });
+
+      try {
+        final response = await gemini.chat(chats);
+        setState(() {
+          chats.add(
+              Content(role: 'model', parts: [Parts(text: response?.output)]));
+        });
+      } catch (error) {
+        setState(() {
+          chats.add(Content(
+              role: 'model',
+              parts: [Parts(text: 'Error: ${error.toString()}')]));
+        });
+      } finally {
+        loading = false;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,31 +80,7 @@ class _ChatPageState extends State<ChatPage> {
           ChatInputBox(
             controller: controller,
             onSend: () async {
-              if (controller.text.isNotEmpty) {
-                final userMessage = controller.text;
-                setState(() {
-                  chats.add(
-                      Content(role: 'user', parts: [Parts(text: userMessage)]));
-                  controller.clear();
-                  loading = true;
-                });
-
-                try {
-                  final response = await gemini.chat(chats);
-                  setState(() {
-                    chats.add(Content(
-                        role: 'model', parts: [Parts(text: response?.output)]));
-                  });
-                } catch (error) {
-                  setState(() {
-                    chats.add(Content(
-                        role: 'model',
-                        parts: [Parts(text: 'Error: ${error.toString()}')]));
-                  });
-                } finally {
-                  loading = false;
-                }
-              }
+              sendMessage();
             },
           ),
         ],
